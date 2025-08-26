@@ -6,6 +6,8 @@ import type { DirectoryData } from "../types";
 import axios from "axios";
 import { useData } from "../hooks/useData";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function FilesTreeView() {
   const { fetchData, setCurrentFileName, setOriginalFileName } = useData();
   const [directoryData, setDirectoryData] = useState<DirectoryData | null>(
@@ -15,7 +17,7 @@ export default function FilesTreeView() {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/list_files");
+        const response = await axios.get(`${API_URL}/list_files`);
         setDirectoryData(response.data);
       } catch (error) {
         console.error("Error fetching files:", error);

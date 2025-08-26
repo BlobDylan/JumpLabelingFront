@@ -2,6 +2,8 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import type { GeoPoint, Statistics } from "../types";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface DataContextType {
   data: GeoPoint[];
   originalFileName: string;
@@ -25,7 +27,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const fetchData = async (filename: string) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:5000/file_data?filename=${filename}.json`
+        `${API_URL}/file_data?filename=${filename}.json`
       );
       setData(response.data);
     } catch (error) {
@@ -40,7 +42,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchStatistics = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/statistics");
+      const response = await axios.get(`${API_URL}/statistics`);
       setStatistics(response.data);
     } catch (error) {
       console.error("Error fetching statistics:", error);

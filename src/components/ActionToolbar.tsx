@@ -4,6 +4,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import axios from "axios";
 import { useData } from "../hooks/useData";
 import { enqueueSnackbar, useSnackbar } from "notistack";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const handleFileUpload = async (
   files: File[] | FileList | null,
@@ -18,13 +19,9 @@ const handleFileUpload = async (
     formData.append("file", file);
     formData.append("filename", file.name);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/upload",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post(`${API_URL}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       updateData(response.data.data);
       setOriginalFileName(response.data.filename);
       setCurrentFileName(response.data.filename);
@@ -56,7 +53,7 @@ const ActionToolbar = () => {
       formData.append("new_filename", currentFileName + ".json");
       formData.append("data", JSON.stringify(data));
 
-      await axios.post("http://127.0.0.1:5000/save_data", formData);
+      await axios.post(`${API_URL}/save_data`, formData);
       setOriginalFileName(currentFileName);
       enqueueSnackbar("Data saved successfully", { variant: "success" });
     } catch (error) {
