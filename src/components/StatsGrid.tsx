@@ -14,7 +14,6 @@ const default_stats = {
 
 const constructStats = (stats: Statistics | null, originalFileName: string) => {
   if (!stats) return default_stats;
-  console.log(stats);
   const currentStats = stats.per_file[
     "uploads/" + originalFileName + ".json"
   ] || {
@@ -34,10 +33,6 @@ const constructStats = (stats: Statistics | null, originalFileName: string) => {
     current_label_1: currentStats.total_label_1,
   };
 
-  console.log({
-    ...currentStatsRenamed,
-    ...totalStats,
-  });
   return {
     ...currentStatsRenamed,
     ...totalStats,

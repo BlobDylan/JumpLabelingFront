@@ -23,8 +23,8 @@ const handleFileUpload = async (
         headers: { "Content-Type": "multipart/form-data" },
       });
       updateData(response.data.data);
-      setOriginalFileName(response.data.filename);
-      setCurrentFileName(response.data.filename);
+      setOriginalFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
+      setCurrentFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
       enqueueSnackbar(
         `File ${response.data.filename} uploaded and loaded successfully`,
         { variant: "success" }
