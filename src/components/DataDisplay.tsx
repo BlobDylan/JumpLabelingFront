@@ -1,18 +1,21 @@
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import GeoScene from "./GeoScene";
 import { useData } from "../hooks/useData";
 
 const DataDisplay = () => {
-  const { data } = useData();
+  const { data, isDataLoading } = useData();
   return (
     <Box
       sx={{
         height: "70dvh",
         backgroundColor: "darkgrey",
         border: "1px solid grey",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <GeoScene data={data} />
+      {isDataLoading ? <CircularProgress /> : <GeoScene data={data} />}
     </Box>
   );
 };

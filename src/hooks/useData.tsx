@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 interface DataContextType {
   data: GeoPoint[];
+  isDataLoading: boolean;
   originalFileName: string;
   currentFileName: string;
   statistics: Statistics | null;
@@ -13,6 +14,7 @@ interface DataContextType {
   fetchStatistics: () => Promise<void>;
   setCurrentFileName: (filename: string) => void;
   setOriginalFileName: (filename: string) => void;
+  setIsDataLoading: (isLoading: boolean) => void;
   updateData: (newData: GeoPoint[]) => void;
 }
 
@@ -20,19 +22,23 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<GeoPoint[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [originalFileName, setOriginalFileName] = useState<string>("");
   const [currentFileName, setCurrentFileName] = useState<string>("");
   const [statistics, setStatistics] = useState<Statistics | null>(null);
 
   const fetchData = async (filename: string) => {
     try {
+      setIsDataLoading(true);
       const response = await axios.get(
         `${API_URL}/file_data?filename=${filename}.json`
       );
       setData(response.data);
+      setIsDataLoading(false);
     } catch (error) {
       console.error("Error fetching file data:", error);
       setData([]);
+      setIsDataLoading(false);
     }
   };
 
@@ -54,6 +60,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     <DataContext.Provider
       value={{
         data,
+        isDataLoading,
         statistics,
         originalFileName,
         currentFileName,
@@ -61,6 +68,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         fetchStatistics,
         setCurrentFileName,
         setOriginalFileName,
+        setIsDataLoading,
         updateData,
       }}
     >
