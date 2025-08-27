@@ -4,17 +4,20 @@ import DataDisplay from "./components/DataDisplay";
 import ActionToolbar from "./components/ActionToolbar";
 import StatsGrid from "./components/StatsGrid";
 import Files from "./components/Files";
+import EnterPassword from "./components/EnterPassword";
 import { useState } from "react";
+import { useAuth } from "./hooks/useAuth";
 import { DataProvider } from "./hooks/useData";
+import { AuthProvider } from "./hooks/useAuth";
 import { SnackbarProvider } from "notistack";
 
-function App() {
+function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
-    <DataProvider>
-      <SnackbarProvider maxSnack={3}>
-        <CssBaseline />
+    <>
+      {isAuthenticated ? (
         <Container maxWidth="xl" sx={{ mt: 10, mb: 4 }}>
           <IconButton
             sx={{ position: "absolute", top: 16, right: 16 }}
@@ -40,8 +43,22 @@ function App() {
             <Files />
           </Drawer>
         </Container>
-      </SnackbarProvider>
-    </DataProvider>
+      ) : (
+        <EnterPassword />
+      )}
+    </>
+  );
+}
+function App() {
+  return (
+    <AuthProvider>
+      <DataProvider>
+        <SnackbarProvider maxSnack={3}>
+          <CssBaseline />
+          <MainLayout />
+        </SnackbarProvider>
+      </DataProvider>
+    </AuthProvider>
   );
 }
 

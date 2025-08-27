@@ -5,6 +5,7 @@ import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import type { DirectoryData } from "../types";
 import axios from "axios";
 import { useData } from "../hooks/useData";
+import { useAuth } from "../hooks/useAuth";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -14,11 +15,16 @@ export default function FilesTreeView() {
   const [directoryData, setDirectoryData] = useState<DirectoryData | null>(
     null
   );
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await axios.get(`${API_URL}/list_files`);
+        const response = await axios.get(`${API_URL}/list_files`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setDirectoryData(response.data);
       } catch (error) {
         console.error("Error fetching files:", error);
