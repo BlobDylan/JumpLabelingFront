@@ -3,42 +3,10 @@ import SaveIcon from "@mui/icons-material/Save";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import axios from "axios";
 import { useData } from "../hooks/useData";
-import { enqueueSnackbar, useSnackbar } from "notistack";
+import { useAuth } from "../hooks/useAuth";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 const API_URL = import.meta.env.VITE_API_URL;
-
-const handleFileUpload = async (
-  files: File[] | FileList | null,
-  setOriginalFileName: (filename: string) => void,
-  setCurrentFileName: (filename: string) => void,
-  updateData: (data: any[]) => void,
-  setIsDataLoading: (isLoading: boolean) => void
-) => {
-  if (!files) return;
-  const filesArray = Array.from(files);
-  for (const file of filesArray) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("filename", file.name);
-    try {
-      setIsDataLoading(true);
-      const response = await axios.post(`${API_URL}/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      updateData(response.data.data);
-      setOriginalFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
-      setCurrentFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
-      enqueueSnackbar(
-        `File ${response.data.filename} uploaded and loaded successfully`,
-        { variant: "success" }
-      );
-      setIsDataLoading(false);
-    } catch (error) {
-      enqueueSnackbar("Error uploading/loading file", { variant: "error" });
-      setIsDataLoading(false);
-    }
-  }
-};
 
 const ActionToolbar = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -51,6 +19,7 @@ const ActionToolbar = () => {
     updateData,
     setIsDataLoading,
   } = useData();
+  const { token } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -61,7 +30,9 @@ const ActionToolbar = () => {
       formData.append("data", JSON.stringify(data));
 
       setIsSaving(true);
-      await axios.post(`${API_URL}/save_data`, formData);
+      await axios.post(`${API_URL}/save_data`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setOriginalFileName(currentFileName);
       enqueueSnackbar("Data saved successfully", { variant: "success" });
       setIsSaving(false);
@@ -75,14 +46,34 @@ const ActionToolbar = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileUpload(
-      event.target.files,
-      setOriginalFileName,
-      setCurrentFileName,
-      updateData,
-      setIsDataLoading
-    );
+  const handleFileUpload = async (files: File[] | FileList | null) => {
+    if (!files) return;
+    const filesArray = Array.from(files);
+    for (const file of filesArray) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("filename", file.name);
+      try {
+        setIsDataLoading(true);
+        const response = await axios.post(`${API_URL}/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        updateData(response.data.data);
+        setOriginalFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
+        setCurrentFileName(response.data.filename.replace(/\.[^/.]+$/, ""));
+        enqueueSnackbar(
+          `File ${response.data.filename} uploaded and loaded successfully`,
+          { variant: "success" }
+        );
+        setIsDataLoading(false);
+      } catch (error) {
+        enqueueSnackbar("Error uploading/loading file", { variant: "error" });
+        setIsDataLoading(false);
+      }
+    }
   };
 
   return (
@@ -122,7 +113,7 @@ const ActionToolbar = () => {
             id="file-upload"
             type="file"
             style={{ display: "none" }}
-            onChange={handleFileChange}
+            onChange={(e) => handleFileUpload(e.target.files)}
             multiple
           />
           <Button

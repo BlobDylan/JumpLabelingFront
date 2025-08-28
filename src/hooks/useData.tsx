@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 interface DataContextType {
   data: GeoPoint[];
   isDataLoading: boolean;
+  isStatisticsLoading: boolean;
   originalFileName: string;
   currentFileName: string;
   statistics: Statistics | null;
@@ -16,6 +17,7 @@ interface DataContextType {
   setCurrentFileName: (filename: string) => void;
   setOriginalFileName: (filename: string) => void;
   setIsDataLoading: (isLoading: boolean) => void;
+  setIsStatisticsLoading: (isLoading: boolean) => void;
   updateData: (newData: GeoPoint[]) => void;
 }
 
@@ -24,6 +26,8 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<GeoPoint[]>([]);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+  const [isStatisticsLoading, setIsStatisticsLoading] =
+    useState<boolean>(false);
   const [originalFileName, setOriginalFileName] = useState<string>("");
   const [currentFileName, setCurrentFileName] = useState<string>("");
   const [statistics, setStatistics] = useState<Statistics | null>(null);
@@ -63,6 +67,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     try {
+      setIsStatisticsLoading(true);
       const response = await axios.get(`${API_URL}/statistics`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,6 +77,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error fetching statistics:", error);
       setStatistics(null);
+    } finally {
+      setIsStatisticsLoading(false);
     }
   };
 
@@ -80,6 +87,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       value={{
         data,
         isDataLoading,
+        isStatisticsLoading,
         statistics,
         originalFileName,
         currentFileName,
@@ -88,6 +96,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setCurrentFileName,
         setOriginalFileName,
         setIsDataLoading,
+        setIsStatisticsLoading,
         updateData,
       }}
     >

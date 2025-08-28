@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, CircularProgress } from "@mui/material";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import type { DirectoryData } from "../types";
@@ -33,21 +33,32 @@ export default function FilesTreeView() {
     fetchFiles();
   }, []);
 
+  const [isDeleting, setIsDeleting] = useState<string[]>([]);
+
   const deleteFile = async (filePath: string) => {
+    setIsDeleting((prev) => [...prev, filePath]);
     try {
-      // make delete request to endpoint described in the comment above
       const cleanFileName = filePath.replace(/\.json$/, "");
       await axios.delete(`${API_URL}/delete_file`, {
         params: { filename: cleanFileName },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       try {
-        const response = await axios.get(`${API_URL}/list_files`);
+        const response = await axios.get(`${API_URL}/list_files`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setDirectoryData(response.data);
       } catch (error) {
         console.error("Error fetching files:", error);
       }
     } catch (error) {
       console.error("Error deleting file:", error);
+    } finally {
+      setIsDeleting((prev) => prev.filter((path) => path !== filePath));
     }
   };
 
@@ -80,14 +91,23 @@ export default function FilesTreeView() {
                 itemId={trimmedPath}
                 label={file.file_name.replace(".json", "")}
                 sx={{ flexGrow: 1 }}
+                disabled={isDeleting.includes(trimmedPath)}
                 onClick={() => {
                   fetchData(cleanPath);
                   setOriginalFileName(cleanPath);
                   setCurrentFileName(cleanPath);
                 }}
               />
-              <Button disableRipple onClick={() => deleteFile(trimmedPath)}>
-                <DeleteIcon />
+              <Button
+                disableRipple
+                onClick={() => deleteFile(trimmedPath)}
+                disabled={trimmedPath in isDeleting}
+              >
+                {isDeleting.includes(trimmedPath) ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <DeleteIcon />
+                )}
               </Button>
             </Stack>
           );

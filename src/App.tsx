@@ -24,6 +24,8 @@ function MainLayout() {
             color="inherit"
             aria-label="menu"
             onClick={() => setDrawerOpen(true)}
+            disableFocusRipple
+            disableTouchRipple
           >
             <MenuOpenIcon />
           </IconButton>

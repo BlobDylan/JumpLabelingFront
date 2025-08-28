@@ -94,7 +94,7 @@ const GeoScene = ({ data }: Props) => {
         <Line points={points} color="white" lineWidth={1} />
       )}
       <OrbitControls />
-      <axesHelper args={[5]} />
+      <axesHelper args={[8]} />
     </Canvas>
   );
 };
