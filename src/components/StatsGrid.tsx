@@ -4,7 +4,7 @@ import { useData } from "../hooks/useData";
 import type { Statistics } from "../types";
 import StatsGridCard from "./StatsGridCard";
 import StatsSkeleton from "./StatsSkeleton";
-
+import { useTheme } from "@mui/material/styles";
 const default_stats = {
   current_total: 0,
   current_label_0: 0,
@@ -12,24 +12,6 @@ const default_stats = {
   total_samples: 0,
   total_label_0: 0,
   total_label_1: 0,
-};
-
-const colorMapping = {
-  current_total: "Grey",
-  current_label_0: "#5CB338",
-  current_label_1: "#FB4141",
-  total_samples: "Grey",
-  total_label_0: "#5CB338",
-  total_label_1: "#FB4141",
-};
-
-const titleMapping = {
-  current_total: "Current Samples",
-  current_label_0: "Current Non-Jumps",
-  current_label_1: "Current Jumps",
-  total_samples: "Total Samples",
-  total_label_0: "Total Non-Jumps",
-  total_label_1: "Total Jumps",
 };
 
 const constructStats = (stats: Statistics | null, originalFileName: string) => {
@@ -60,6 +42,25 @@ const constructStats = (stats: Statistics | null, originalFileName: string) => {
 };
 
 const StatsGrid = () => {
+  const theme = useTheme();
+
+  const colorMapping = {
+    current_total: theme.customColors.sampleGray,
+    current_label_0: theme.customColors.jumpRed,
+    current_label_1: theme.customColors.nonJumpGreen,
+    total_samples: theme.customColors.sampleGray,
+    total_label_0: theme.customColors.jumpRed,
+    total_label_1: theme.customColors.nonJumpGreen,
+  };
+
+  const titleMapping = {
+    current_total: "Current Samples",
+    current_label_0: "Current Non-Jumps",
+    current_label_1: "Current Jumps",
+    total_samples: "Total Samples",
+    total_label_0: "Total Non-Jumps",
+    total_label_1: "Total Jumps",
+  };
   const { statistics, originalFileName, fetchStatistics, isStatisticsLoading } =
     useData();
   const stats = constructStats(statistics, originalFileName);

@@ -7,13 +7,20 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 
 const EnterPassword = () => {
   const { login, isLoadingAuth } = useAuth();
   const [password, setPassword] = useState("");
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLogin = async () => {
-    await login(password);
+    const success = await login(password);
+    if (success) {
+      enqueueSnackbar("Login successful", { variant: "success" });
+    } else {
+      enqueueSnackbar("Login failed", { variant: "error" });
+    }
   };
 
   return (

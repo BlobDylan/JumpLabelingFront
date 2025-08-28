@@ -5,11 +5,14 @@ import ActionToolbar from "./components/ActionToolbar";
 import StatsGrid from "./components/StatsGrid";
 import Files from "./components/Files";
 import EnterPassword from "./components/EnterPassword";
+import theme from "./Theme";
 import { useState } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { DataProvider } from "./hooks/useData";
 import { AuthProvider } from "./hooks/useAuth";
 import { SnackbarProvider } from "notistack";
+import { Typography, Stack } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 
 function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -18,17 +21,24 @@ function MainLayout() {
   return (
     <>
       {isAuthenticated ? (
-        <Container maxWidth="xl" sx={{ mt: 10, mb: 4 }}>
-          <IconButton
-            sx={{ position: "absolute", top: 16, right: 16 }}
-            color="inherit"
-            aria-label="menu"
-            onClick={() => setDrawerOpen(true)}
-            disableFocusRipple
-            disableTouchRipple
+        <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+          <Stack
+            direction={"row"}
+            alignItems="center"
+            justifyContent={"space-between"}
+            sx={{ mt: 0, mb: 2 }}
           >
-            <MenuOpenIcon />
-          </IconButton>
+            <Typography variant="h4">Jump Labeling</Typography>
+            <IconButton
+              color="inherit"
+              aria-label="menu"
+              onClick={() => setDrawerOpen(true)}
+              disableFocusRipple
+              disableTouchRipple
+            >
+              <MenuOpenIcon />
+            </IconButton>
+          </Stack>
           <Box width="100%">
             <DataDisplay />
             <ActionToolbar />
@@ -40,7 +50,7 @@ function MainLayout() {
             anchor="right"
             open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
-            sx={{ width: "30dvw" }}
+            sx={{ "& .MuiDrawer-paper": { width: "20dvw", minWidth: 300 } }}
           >
             <Files />
           </Drawer>
@@ -57,7 +67,9 @@ function App() {
       <DataProvider>
         <SnackbarProvider maxSnack={3}>
           <CssBaseline />
-          <MainLayout />
+          <ThemeProvider theme={theme}>
+            <MainLayout />
+          </ThemeProvider>
         </SnackbarProvider>
       </DataProvider>
     </AuthProvider>

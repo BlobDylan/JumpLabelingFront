@@ -117,7 +117,7 @@ export default function FilesTreeView() {
   };
 
   return (
-    <Box sx={{ minWidth: 250 }}>
+    <Box>
       <SimpleTreeView>
         {directoryData ? (
           renderTree(directoryData)

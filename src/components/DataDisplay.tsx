@@ -1,5 +1,6 @@
 import { Box, CircularProgress } from "@mui/material";
 import GeoScene from "./GeoScene";
+import GeoSceneOverlay from "./GeoSceneOverlay";
 import { useData } from "../hooks/useData";
 
 const DataDisplay = () => {
@@ -11,10 +12,10 @@ const DataDisplay = () => {
         backgroundColor: "darkgrey",
         border: "1px solid grey",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "relative",
       }}
     >
+      <GeoSceneOverlay />
       {isDataLoading ? <CircularProgress /> : <GeoScene data={data} />}
     </Box>
   );

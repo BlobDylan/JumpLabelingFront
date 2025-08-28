@@ -12,7 +12,6 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoadingAuth: boolean;
-  error: string | null;
   login: (password: string) => Promise<boolean>;
 }
 
@@ -25,7 +24,6 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Check for existing token on initial load
   useEffect(() => {
@@ -37,8 +35,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (password: string): Promise<boolean> => {
     setIsLoadingAuth(true);
-    setError(null);
-
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
@@ -59,8 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoadingAuth(false);
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Login failed";
-      setError(errorMessage);
       setIsLoadingAuth(false);
       return false;
     }
@@ -70,7 +64,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     isAuthenticated: !!token,
     isLoadingAuth,
-    error,
     login,
   };
 
