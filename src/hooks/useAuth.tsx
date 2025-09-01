@@ -13,6 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoadingAuth: boolean;
   login: (password: string) => Promise<boolean>;
+  unauthorizedFallback: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,12 +60,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     }
   };
+  const unauthorizedFallback = () => {
+    setToken(null);
+    localStorage.removeItem("authToken");
+  };
 
   const value: AuthContextType = {
     token,
     isAuthenticated: !!token,
     isLoadingAuth,
     login,
+    unauthorizedFallback,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

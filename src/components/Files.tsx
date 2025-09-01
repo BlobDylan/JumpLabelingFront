@@ -7,31 +7,20 @@ import axios from "axios";
 import { useData } from "../hooks/useData";
 import { useAuth } from "../hooks/useAuth";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useSnackbar } from "notistack";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function FilesTreeView() {
-  const { fetchData, setCurrentFileName, setOriginalFileName } = useData();
-  const [directoryData, setDirectoryData] = useState<DirectoryData | null>(
-    null
-  );
-  const { token } = useAuth();
-
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/list_files`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setDirectoryData(response.data);
-      } catch (error) {
-        console.error("Error fetching files:", error);
-      }
-    };
-    fetchFiles();
-  }, []);
+  const {
+    fetchData,
+    setCurrentFileName,
+    setOriginalFileName,
+    directoryData,
+    fetchDirectoryData,
+  } = useData();
+  const { token, unauthorizedFallback } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [isDeleting, setIsDeleting] = useState<string[]>([]);
 
@@ -45,18 +34,14 @@ export default function FilesTreeView() {
           Authorization: `Bearer ${token}`,
         },
       });
-      try {
-        const response = await axios.get(`${API_URL}/list_files`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setDirectoryData(response.data);
-      } catch (error) {
-        console.error("Error fetching files:", error);
-      }
+      fetchDirectoryData();
     } catch (error) {
-      console.error("Error deleting file:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        enqueueSnackbar("Session expired", { variant: "error" });
+        unauthorizedFallback();
+      } else {
+        enqueueSnackbar("Error deleting file", { variant: "error" });
+      }
     } finally {
       setIsDeleting((prev) => prev.filter((path) => path !== filePath));
     }

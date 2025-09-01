@@ -19,7 +19,7 @@ const ActionToolbar = () => {
     updateData,
     setIsDataLoading,
   } = useData();
-  const { token } = useAuth();
+  const { token, unauthorizedFallback } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -38,9 +38,15 @@ const ActionToolbar = () => {
       setIsSaving(false);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        enqueueSnackbar(error.response.data, { variant: "error" });
+        if (error.response.status === 401) {
+          enqueueSnackbar("Session expired", { variant: "error" });
+          unauthorizedFallback();
+        }
       } else {
-        enqueueSnackbar("An unexpected error occurred", { variant: "error" });
+        enqueueSnackbar("Error saving file", { variant: "error" });
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          unauthorizedFallback();
+        }
       }
       setIsSaving(false);
     }
@@ -70,7 +76,12 @@ const ActionToolbar = () => {
         );
         setIsDataLoading(false);
       } catch (error) {
-        enqueueSnackbar("Error uploading/loading file", { variant: "error" });
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          enqueueSnackbar("Session expired", { variant: "error" });
+          unauthorizedFallback();
+        } else {
+          enqueueSnackbar("Error uploading/loading file", { variant: "error" });
+        }
         setIsDataLoading(false);
       }
     }
@@ -121,7 +132,7 @@ const ActionToolbar = () => {
             startIcon={<FileUploadIcon />}
             component="span"
           >
-            Upload File
+            Upload
           </Button>
         </label>
       </Stack>

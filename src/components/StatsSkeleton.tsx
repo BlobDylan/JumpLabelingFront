@@ -5,8 +5,7 @@ const StatsSkeleton = () => {
     <Skeleton
       variant="rectangular"
       width="100%"
-      height={90}
-      sx={{ borderRadius: 1 }}
+      sx={{ minHeight: 150, borderRadius: 1 }}
     />
   );
 };

@@ -78,9 +78,9 @@ const StatsGrid = () => {
         <Typography>Refresh Stats</Typography>
       </IconButton>
 
-      <Grid container spacing={8} justifyContent="center">
+      <Grid container spacing={4} display="flex" justifyContent="center">
         {Object.entries(stats).map(([key, value]) => (
-          <Grid size={4} key={key}>
+          <Grid size={4} minHeight={200} key={key}>
             {isStatisticsLoading ? (
               <StatsSkeleton />
             ) : (

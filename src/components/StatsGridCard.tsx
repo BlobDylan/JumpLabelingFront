@@ -18,6 +18,11 @@ const StatsGridCard: React.FC<StatsGridCardProps> = ({
         textAlign: "center",
         backgroundColor: color,
         boxShadow: 10,
+        minHeight: 150,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <Typography variant="h6">{title}</Typography>

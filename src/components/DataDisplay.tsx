@@ -13,6 +13,8 @@ const DataDisplay = () => {
         border: "1px solid grey",
         display: "flex",
         position: "relative",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <GeoSceneOverlay />

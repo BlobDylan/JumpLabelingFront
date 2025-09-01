@@ -8,6 +8,7 @@ import EnterPassword from "./components/EnterPassword";
 import theme from "./Theme";
 import { useState } from "react";
 import { useAuth } from "./hooks/useAuth";
+import { useData } from "./hooks/useData";
 import { DataProvider } from "./hooks/useData";
 import { AuthProvider } from "./hooks/useAuth";
 import { SnackbarProvider } from "notistack";
@@ -17,6 +18,12 @@ import { ThemeProvider } from "@mui/material/styles";
 function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { fetchDirectoryData } = useData();
+
+  const handleDrawerOpen = () => {
+    fetchDirectoryData();
+    setDrawerOpen(true);
+  };
 
   return (
     <>
@@ -32,7 +39,7 @@ function MainLayout() {
             <IconButton
               color="inherit"
               aria-label="menu"
-              onClick={() => setDrawerOpen(true)}
+              onClick={handleDrawerOpen}
               disableFocusRipple
               disableTouchRipple
             >
@@ -63,16 +70,16 @@ function MainLayout() {
 }
 function App() {
   return (
-    <AuthProvider>
-      <DataProvider>
-        <SnackbarProvider maxSnack={3}>
+    <SnackbarProvider maxSnack={3}>
+      <AuthProvider>
+        <DataProvider>
           <CssBaseline />
           <ThemeProvider theme={theme}>
             <MainLayout />
           </ThemeProvider>
-        </SnackbarProvider>
-      </DataProvider>
-    </AuthProvider>
+        </DataProvider>
+      </AuthProvider>
+    </SnackbarProvider>
   );
 }
 
