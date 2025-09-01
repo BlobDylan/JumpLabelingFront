@@ -4,15 +4,20 @@ import {
   Typography,
   CircularProgress,
   Button,
-  TextField,
   Paper,
+  InputAdornment,
+  IconButton,
+  OutlinedInput,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const EnterPassword = () => {
   const { login, isLoadingAuth } = useAuth();
   const [password, setPassword] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     const success = await login(password);
@@ -43,14 +48,24 @@ const EnterPassword = () => {
         <Typography variant="h6" sx={{ mb: 0 }}>
           Enter Password
         </Typography>
-        <TextField
-          sx={{ mt: 2 }}
-          type="password"
-          label="Password"
-          variant="outlined"
-          fullWidth
-          value={password}
+        <OutlinedInput
+          id="outlined-adornment-password"
+          type={showPassword ? "text" : "password"}
           onChange={(e) => setPassword(e.target.value)}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label={
+                  showPassword ? "hide the password" : "display the password"
+                }
+                onClick={() => setShowPassword((show) => !show)}
+                edge="end"
+                disableRipple
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
         />
         {isLoadingAuth ? (
           <Button
