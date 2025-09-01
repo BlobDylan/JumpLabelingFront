@@ -34,7 +34,8 @@ export default function FilesTreeView() {
           Authorization: `Bearer ${token}`,
         },
       });
-      fetchDirectoryData();
+      await fetchDirectoryData();
+      enqueueSnackbar("File deleted successfully", { variant: "success" });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         enqueueSnackbar("Session expired", { variant: "error" });
