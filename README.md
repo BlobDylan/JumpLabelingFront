@@ -1,69 +1,55 @@
-# React + TypeScript + Vite
+# Jump Labeling
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Typescript React + Vite front end, Python flask backend, AWS S3 for
+storage.\
+A tool designed to make labeling geo-location data labeling easier,\
+Display the data in 3d (lat, lng, time) for easy viewing of overlapping
+points (using RTF).
 
-Currently, two official plugins are available:
+Supports uploading files, saving, and viewing shared files of labeled
+data.\
+To label we click the points displayed in 3d toggeling between Jump and
+not Jump.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+We can also see statistics which include total samples, total jump
+samples, total non-jump samples, and the same for the file currently
+being viewed.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Configure environment variables for front end:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=""
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Configure environment variables for back end:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```env
+FLASK_ENV="development"
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_REGION=""
+S3_BUCKET_NAME=""
+S3_STATS_KEY=""
+CORS_ORIGIN=""
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+ADMIN_PASSWORD_HASH=""
+JWT_SECRET_KEY=""
+```
+
+---
+
+## To run locally front end:
+
+```sh
+npm install
+npm run dev
+```
+
+## For backend:
+
+```sh
+pip install -r requirements.txt
+python app.py
 ```
