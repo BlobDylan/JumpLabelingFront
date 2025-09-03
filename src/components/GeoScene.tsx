@@ -1,4 +1,4 @@
-import { Environment, Line, OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useMemo, useState, useEffect, useRef } from "react";
 import * as THREE from "three";
@@ -14,7 +14,6 @@ const GeoScene = ({ data }: Props) => {
   const orbitRef = useRef<any>(null);
   const defaultCameraPosition = [0, 5, 10];
 
-  // Handler to reset camera position
   const handleResetCamera = () => {
     if (orbitRef.current && orbitRef.current.object) {
       orbitRef.current.object.position.set(...defaultCameraPosition);
@@ -24,16 +23,13 @@ const GeoScene = ({ data }: Props) => {
       }
     }
   };
-  // Normalize data and store with label state
-  const getNormalizedData = (inputData: GeoPoint[]) => {
+  const getNormalizedData = (inputData: GeoPoint[], sphereRadius: number) => {
     if (inputData.length === 0) return [];
 
     const minLat = Math.min(...inputData.map((p) => p.lat));
     const maxLat = Math.max(...inputData.map((p) => p.lat));
     const minLon = Math.min(...inputData.map((p) => p.lon));
     const maxLon = Math.max(...inputData.map((p) => p.lon));
-    const minTime = Math.min(...inputData.map((p) => p.time));
-    const maxTime = Math.max(...inputData.map((p) => p.time));
 
     const normalize = (
       value: number,
@@ -46,11 +42,13 @@ const GeoScene = ({ data }: Props) => {
       return newMin + ((value - min) * (newMax - newMin)) / (max - min);
     };
 
-    return inputData.map((p) => ({
+    const sorted = [...inputData].sort((a, b) => a.time - b.time);
+    const minSpacing = 2 * sphereRadius;
+    return sorted.map((p, i) => ({
       ...p,
       normLat: normalize(p.lat, minLat, maxLat),
       normLon: normalize(p.lon, minLon, maxLon),
-      normTime: normalize(p.time, minTime, maxTime),
+      normTime: i * minSpacing,
       label: p.label ?? 0,
     }));
   };
@@ -72,11 +70,17 @@ const GeoScene = ({ data }: Props) => {
   };
 
   const { updateData } = useData();
-  const [localData, setLocalData] = useState(() => getNormalizedData(data));
+  const [sphereRadius, setSphereRadius] = useState(0.1);
+  const [localData, setLocalData] = useState(() =>
+    getNormalizedData(data, sphereRadius)
+  );
 
-  // Update localData when data changes
   useEffect(() => {
-    setLocalData(getNormalizedData(data));
+    const tempData = getNormalizedData(data, sphereRadius);
+    const minDist = getMinDistance(tempData);
+    const newRadius = minDist / 3;
+    setSphereRadius(newRadius);
+    setLocalData(getNormalizedData(data, newRadius));
   }, [data]);
 
   const points = useMemo(() => {
@@ -100,12 +104,6 @@ const GeoScene = ({ data }: Props) => {
       return updated;
     });
   };
-
-  const sphereRadius = useMemo(() => {
-    if (localData.length < 2) return 0.1;
-    const minDist = getMinDistance(localData);
-    return minDist / 3;
-  }, [localData]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
@@ -141,9 +139,29 @@ const GeoScene = ({ data }: Props) => {
             />
           </mesh>
         ))}
-        {points.length > 1 && (
-          <Line points={points} color="white" lineWidth={1} />
-        )}
+        {points.length > 1 &&
+          points.slice(0, -1).map((start, i) => {
+            const end = points[i + 1];
+            const dir = new THREE.Vector3().subVectors(end, start).normalize();
+            const length = start.distanceTo(end) - 2 * sphereRadius;
+            const origin = new THREE.Vector3().addVectors(
+              start,
+              dir.clone().multiplyScalar(sphereRadius)
+            );
+            return (
+              <arrowHelper
+                key={i}
+                args={[
+                  dir,
+                  origin,
+                  length,
+                  "white",
+                  sphereRadius * 1.5,
+                  sphereRadius * 0.75,
+                ]}
+              />
+            );
+          })}
         <axesHelper args={[8]} />
       </Canvas>
     </div>
