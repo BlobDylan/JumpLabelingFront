@@ -46,11 +46,11 @@ const StatsGrid = () => {
 
   const colorMapping = {
     current_total: theme.customColors.sampleGray,
-    current_label_0: theme.customColors.jumpRed,
-    current_label_1: theme.customColors.nonJumpGreen,
+    current_label_0: theme.customColors.nonJumpGreen,
+    current_label_1: theme.customColors.jumpRed,
     total_samples: theme.customColors.sampleGray,
-    total_label_0: theme.customColors.jumpRed,
-    total_label_1: theme.customColors.nonJumpGreen,
+    total_label_0: theme.customColors.nonJumpGreen,
+    total_label_1: theme.customColors.jumpRed,
   };
 
   const titleMapping = {

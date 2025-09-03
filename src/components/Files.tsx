@@ -11,7 +11,7 @@ import { useSnackbar } from "notistack";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function FilesTreeView() {
+export default function FilesTreeView({ close }: { close: () => void }) {
   const {
     fetchData,
     setCurrentFileName,
@@ -82,6 +82,7 @@ export default function FilesTreeView() {
                   fetchData(cleanPath);
                   setOriginalFileName(cleanPath);
                   setCurrentFileName(cleanPath);
+                  close();
                 }}
               />
               <Button

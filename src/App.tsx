@@ -59,7 +59,7 @@ function MainLayout() {
             onClose={() => setDrawerOpen(false)}
             sx={{ "& .MuiDrawer-paper": { width: "20dvw", minWidth: 300 } }}
           >
-            <Files />
+            <Files close={() => setDrawerOpen(false)} />
           </Drawer>
         </Container>
       ) : (
