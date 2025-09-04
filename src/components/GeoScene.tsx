@@ -70,35 +70,49 @@ const GeoScene = ({ data }: Props) => {
   };
 
   const { updateData } = useData();
-  const [sphereRadius, setSphereRadius] = useState(0.1);
-  const [localData, setLocalData] = useState(() =>
-    getNormalizedData(data, sphereRadius)
+  // Store labels separately so updating them doesn't affect normalization
+  const [labels, setLabels] = useState<GeoPoint["label"][]>(
+    data.map((p) => p.label ?? 0)
   );
+  // Calculate sphereRadius and normalized data only when data changes
+  const [sphereRadius, setSphereRadius] = useState(0.1);
+  const [normalizedData, setNormalizedData] = useState<
+    ReturnType<typeof getNormalizedData>
+  >([]);
 
   useEffect(() => {
-    const tempData = getNormalizedData(data, sphereRadius);
+    // Reset labels on new data
+    setLabels(data.map((p) => p.label ?? 0));
+    // Initial normalization and sphere radius calculation
+    const tempData = getNormalizedData(data, 0.1);
     const minDist = getMinDistance(tempData);
     const newRadius = minDist / 3;
     setSphereRadius(newRadius);
-    setLocalData(getNormalizedData(data, newRadius));
+    setNormalizedData(getNormalizedData(data, newRadius));
   }, [data]);
 
+  // Merge normalized positions with current labels
+  const mergedData = useMemo(() => {
+    return normalizedData.map((p, i) => ({ ...p, label: labels[i] ?? 0 }));
+  }, [normalizedData, labels]);
+
   const points = useMemo(() => {
-    return localData.map(
+    return mergedData.map(
       (p) => new THREE.Vector3(p.normLon, p.normTime, p.normLat)
     );
-  }, [localData]);
+  }, [mergedData]);
 
   const handlePointClick = (idx: number) => {
-    setLocalData((prev) => {
-      const updated = prev.map((p, i) =>
-        i === idx ? { ...p, label: (p.label === 0 ? 1 : 0) as 0 | 1 } : p
+    setLabels((prev) => {
+      const updated = prev.map((label, i) =>
+        i === idx ? (label === 0 ? 1 : 0) : label
       );
-      const contextData = updated.map((p) => ({
+      // Sync to global context
+      const contextData = data.map((p, i) => ({
         lat: p.lat,
         lon: p.lon,
         time: p.time,
-        label: p.label,
+        label: updated[i],
       }));
       updateData(contextData);
       return updated;
@@ -126,7 +140,7 @@ const GeoScene = ({ data }: Props) => {
       >
         <OrbitControls ref={orbitRef} />
         <Environment preset="forest" />
-        {localData.map((point, i) => (
+        {mergedData.map((point, i) => (
           <mesh
             key={i}
             position={[point.normLon, point.normTime, point.normLat]}
