@@ -109,6 +109,7 @@ const GeoScene = ({ data }: Props) => {
       );
       // Sync to global context
       const contextData = data.map((p, i) => ({
+
         lat: p.lat,
         lon: p.lon,
         time: p.time,
@@ -141,6 +142,7 @@ const GeoScene = ({ data }: Props) => {
         <OrbitControls ref={orbitRef} />
         <Environment preset="forest" />
         {mergedData.map((point, i) => (
+
           <mesh
             key={i}
             position={[point.normLon, point.normTime, point.normLat]}
