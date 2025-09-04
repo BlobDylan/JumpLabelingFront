@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Stack, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Button,
+  CircularProgress,
+  Typography,
+  Tooltip,
+} from "@mui/material";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import type { DirectoryData } from "../types";
@@ -66,17 +73,18 @@ export default function FilesTreeView({ close }: { close: () => void }) {
             .replace(/\\/g, "/")
             .replace(".json", "");
           return (
-            <Stack
-              direction="row"
-              alignItems="center"
-              sx={{ justifyContent: "space-between" }}
-              key={trimmedPath}
-            >
+            <Stack direction="row" alignItems="center" sx={{ width: "100%" }}>
               <TreeItem
                 key={trimmedPath}
                 itemId={trimmedPath}
-                label={file.file_name.replace(".json", "")}
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, minWidth: 0 }}
+                label={
+                  <Tooltip title={file.file_name.replace(".json", "")}>
+                    <Typography noWrap>
+                      {file.file_name.replace(".json", "")}
+                    </Typography>
+                  </Tooltip>
+                }
                 disabled={isDeleting.includes(trimmedPath)}
                 onClick={() => {
                   fetchData(cleanPath);
